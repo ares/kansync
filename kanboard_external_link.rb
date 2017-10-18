@@ -1,0 +1,3 @@
+class KanboardExternalLink < KanboardResource
+
+end

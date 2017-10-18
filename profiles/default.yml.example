@@ -1,0 +1,24 @@
+connection:
+  kanboard:
+    # user name, jsonrpc is the special username that can be used with API token, regular user accounts should work fine too
+    user: 'jsonrpc'
+    # for jsonrpc you can find this in your kanboard at /settings/api, otherwise it's user's password
+    pw: ''
+    # where your kanboard lives
+    url: 'http://172.17.0.2/'
+
+kanboard:
+  project_id: 1
+
+# default log level is debug, you can change it to info, warn, error, fatal
+# logger_level: debug
+
+# if whitelist is specified, only listed tasks will be executed
+# if no whitelist is specified, all tasks will be executed
+# whitelist: []
+
+# you can further limit what tasks will not be executed by blacklist
+# if whitelist was specified, tasks can be explicitly ignored by blacklist
+# blacklist overrides whitelist
+# if whitelist was not specified and blacklist was set to [ tasks/a.rb ], all tasks except a.rb would be executed
+blacklist: []
