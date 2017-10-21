@@ -49,6 +49,11 @@ class KanboardTask < KanboardResource
     @connection.request('moveTaskPosition', { 'project_id' => project_id, 'task_id' => @id, 'column_id' => column_id, 'position' => 1, 'swimlane_id' => swimlane_id})
   end
 
+  def set_owner(name)
+    user_id = KanboardUser.find_by_name(connection, name).id
+    @connection.request('updateTask', { 'id' => @id, 'owner_id' => user_id })
+  end
+
   def tags
     @connection.request('getTaskTags', [@id]).map(&:last)
   end

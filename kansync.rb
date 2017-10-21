@@ -18,12 +18,13 @@ require 'kanboard_project'
 require 'kanboard_task'
 require 'kanboard_swimlane'
 require 'kanboard_external_link'
+require 'kanboard_user'
 
 require 'redmine_issue'
 
 class Kansync
   WRONG_USAGE = 1
-  attr_reader :profile, :logger, :kanboard_connection
+  attr_reader :profile, :kanboard_connection
 
   def initialize
     wrong_usage! if ARGV.size != 1
@@ -49,6 +50,14 @@ class Kansync
     end
   end
 
+  def self.logger
+    @@logger
+  end
+
+  def logger
+    self.class.logger
+  end
+
   private
 
   def task_name(filename)
@@ -60,8 +69,8 @@ class Kansync
   end
 
   def prepare_logger
-    @logger = Logger.new(STDOUT)
-    @logger.level = @profile['logger_level'] || Logger::DEBUG
+    @@logger = Logger.new(STDOUT)
+    @@logger.level = @profile['logger_level'] || Logger::DEBUG
   end
 
   def prepare_kanboard_connection

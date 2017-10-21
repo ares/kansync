@@ -19,4 +19,12 @@ class RedmineIssue
   def status_id
     @attrs['status']['id'].to_i
   end
+
+  def assigned_to
+    @attrs.fetch('assigned_to', {})['name']
+  end
+
+  def updated_on
+    @attrs['updated_on']
+  end
 end
