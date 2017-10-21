@@ -20,5 +20,5 @@ kanboard:
 # you can further limit what tasks will not be executed by blacklist
 # if whitelist was specified, tasks can be explicitly ignored by blacklist
 # blacklist overrides whitelist
-# if whitelist was not specified and blacklist was set to [ tasks/a.rb ], all tasks except a.rb would be executed
+# if whitelist was not specified and blacklist was set to [ 'some' ], all tasks except tasks/sone.rb would be executed
 blacklist: []

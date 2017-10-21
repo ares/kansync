@@ -13,6 +13,7 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 require 'request_factory'
 
 require 'kanboard_resource'
+require 'kanboard_column'
 require 'kanboard_project'
 require 'kanboard_task'
 require 'kanboard_swimlane'
@@ -34,16 +35,25 @@ class Kansync
 
   def run_tasks
     tasks = Dir.glob('tasks/*.rb')
-    tasks = tasks.select { |t| profile['whitelist'].include?(t) } if profile.has_key?('whitelist')
+    tasks = tasks.select { |t| profile['whitelist'].include?(task_name(t)) } if profile.has_key?('whitelist')
 
     tasks.each do |task|
-      next if profile['blacklist'].include?(task)
+      next if profile['blacklist'].include?(task_name(task))
 
+      project = KanboardProject.new(kanboard_connection, 'id' => profile['kanboard']['project_id'])
+      task_configuration = profile['configuration'][task_name(task)] || {}
+
+      logger.info "Starting task #{task}"
       instance_eval File.read(task), task, 1
+      logger.info "Finished task #{task}\n"
     end
   end
 
   private
+
+  def task_name(filename)
+    File.basename(filename, '.rb')
+  end
 
   def load_profile
     @profile = YAML.load_file ARGV[0]

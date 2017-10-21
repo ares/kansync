@@ -15,4 +15,8 @@ class RedmineIssue
   def bugzilla_link
     "https://bugzilla.redhat.com/show_bug.cgi?id=#{bugzilla_id}"
   end
+
+  def status_id
+    @attrs['status']['id'].to_i
+  end
 end

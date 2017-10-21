@@ -1,0 +1,3 @@
+# you can use anything from kansync context, e.g.
+# project - the project loaded using project id set in current profile
+# task_configuration - the configuration set for this task in current profile

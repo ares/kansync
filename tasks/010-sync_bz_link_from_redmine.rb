@@ -1,4 +1,3 @@
-project = KanboardProject.new(kanboard_connection, 'id' => profile['kanboard']['project_id'])
 project.current_tasks.each do |task|
   logger.info "Processing #{task.title}"
 

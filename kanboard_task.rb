@@ -43,4 +43,13 @@ class KanboardTask < KanboardResource
     params = [ @id.to_i, url, 'related', type, title ]
     @connection.request('createExternalTaskLink', params)
   end
+
+  def move_to_column(name)
+    column_id = KanboardColumn.find_by_name(connection, project_id, name).id
+    @connection.request('moveTaskPosition', { 'project_id' => project_id, 'task_id' => @id, 'column_id' => column_id, 'position' => 1, 'swimlane_id' => swimlane_id})
+  end
+
+  def tags
+    @connection.request('getTaskTags', [@id]).map(&:last)
+  end
 end
