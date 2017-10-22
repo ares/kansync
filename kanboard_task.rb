@@ -14,7 +14,7 @@ class KanboardTask < KanboardResource
   end
 
   def github_links?
-    github_link.any?
+    github_links.any?
   end
 
   def github_links
@@ -22,7 +22,7 @@ class KanboardTask < KanboardResource
   end
 
   def bugzilla_links?
-    bugzilla_link.any?
+    bugzilla_links.any?
   end
 
   def bugzilla_links
@@ -52,6 +52,10 @@ class KanboardTask < KanboardResource
   def set_owner(name)
     user_id = KanboardUser.find_by_name(connection, name).id
     @connection.request('updateTask', { 'id' => @id, 'owner_id' => user_id })
+  end
+
+  def set_complexity(complexity)
+    @connection.request('updateTask', { 'id' => @id, 'complexity' => complexity })
   end
 
   def tags

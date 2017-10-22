@@ -5,6 +5,7 @@ require 'awesome_print'
 require 'json'
 require 'yaml'
 require 'logger'
+require 'active_support/core_ext/hash/conversions.rb'
 require 'pry'
 
 libdir = File.dirname(__FILE__)
@@ -21,6 +22,7 @@ require 'kanboard_external_link'
 require 'kanboard_user'
 
 require 'redmine_issue'
+require 'bugzilla'
 
 class Kansync
   WRONG_USAGE = 1
