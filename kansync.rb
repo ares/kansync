@@ -26,7 +26,7 @@ require 'bugzilla'
 
 class Kansync
   WRONG_USAGE = 1
-  attr_reader :profile, :kanboard_connection
+  attr_reader :profile
 
   def initialize
     wrong_usage! if ARGV.size != 1
@@ -43,7 +43,7 @@ class Kansync
     tasks.each do |task|
       next if profile['blacklist'].include?(task_name(task))
 
-      project = KanboardProject.new(kanboard_connection, 'id' => profile['kanboard']['project_id'])
+      project = KanboardProject.new('id' => profile['kanboard']['project_id'])
       task_configuration = profile['configuration'][task_name(task)] || {}
 
       logger.info "Starting task #{task}"
@@ -58,6 +58,14 @@ class Kansync
 
   def logger
     self.class.logger
+  end
+
+  def self.kanboard_connection
+    @@kanboard_connection
+  end
+
+  def kanboard_connection
+    @@kanboard_connection
   end
 
   private
@@ -76,7 +84,7 @@ class Kansync
   end
 
   def prepare_kanboard_connection
-    @kanboard_connection = RequestFactory.new(profile['connection']['kanboard'])
+    @@kanboard_connection = RequestFactory.new(profile['connection']['kanboard'])
   end
 
   def wrong_usage!
