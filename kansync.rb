@@ -6,6 +6,7 @@ require 'json'
 require 'yaml'
 require 'logger'
 require 'active_support/core_ext/hash/conversions.rb'
+require 'active_support/core_ext/numeric/time.rb'
 require 'pry'
 
 libdir = File.dirname(__FILE__)
