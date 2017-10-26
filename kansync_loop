@@ -1,0 +1,6 @@
+cd /opt/app-root
+#while true; do
+  ls -l profiles
+  ./kansync.rb profiles/default.yml
+  sleep 1
+#done
