@@ -1,6 +1,14 @@
 cd /opt/app-root
-#while true; do
-  ls -l profiles
-  ./kansync.rb profiles/default.yml
-  sleep 1
-#done
+
+if [ -z "$1" ]; then
+  ./kansync.rb
+  exit
+fi
+
+trap "exit 0" SIGINT SIGTERM;
+while true; do
+  ./kansync.rb $1
+  interval=${2:-600}
+  echo "Sleeping for $interval seconds"
+  sleep $interval 
+done
