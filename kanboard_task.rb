@@ -5,6 +5,11 @@ class KanboardTask < KanboardResource
   GITHUB_URL = 'github.com'
   BUGZILLA_URL = 'bugzilla.redhat.com'
 
+  def self.create(params)
+    id = connection.request('createTask', params)
+    new connection.request('getTask', 'task_id' => id)
+  end
+
   def redmine_links?
     redmine_links.any?
   end
@@ -65,5 +70,9 @@ class KanboardTask < KanboardResource
 
   def tags
     connection.request('getTaskTags', [@id]).map(&:last)
+  end
+
+  def owner
+    KanboardUser.find_by_id(self.owner_id)
   end
 end
