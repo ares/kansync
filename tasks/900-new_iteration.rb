@@ -1,3 +1,8 @@
+# TODO
+# done tags, done column name could be configurable
+# old iteration position should be configurable
+# date time format could be configurable
+
 old_iteration_number = /\((\d+)\)/.match(project.current_swimlane.name)[1].to_i
 new_iteration_number = old_iteration_number + 1
 logger.info "New iteration number will be #{new_iteration_number}"
