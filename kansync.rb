@@ -8,6 +8,7 @@ require 'logger'
 require 'active_support/core_ext/hash/conversions.rb'
 require 'active_support/core_ext/numeric/time.rb'
 require 'pry'
+require 'optparse'
 
 libdir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
@@ -30,22 +31,56 @@ class Kansync
   attr_reader :profile
 
   def initialize
-    wrong_usage! if ARGV.size != 1
+    @options = parse_args!
 
     load_profile
     prepare_logger
     prepare_kanboard_connection
   end
 
+  def parse_args!
+    options = {}
+    parser = OptionParser.new do |opts|
+      opts.banner = 'Usage: kansync.rb [options]'
+
+      opts.on('-t', '--task=TASK_FILE', 'Task file') do |v|
+        @task_file = v
+      end
+
+      opts.on('-p', '--profile=PROFILE_FILE', 'Profile file') do |v|
+        @profile_file = v
+      end
+
+      opts.on('-P', '--project-id=PROJECT_ID', 'Project id') do |v|
+        @project_id = v
+      end
+    end
+    parser.parse!
+
+    unless @profile_file
+      puts 'Missing --profile option'
+      puts parser.help
+      exit(WRONG_USAGE)
+    end
+    options
+  end
+
+  def project_id
+    @project_id ||= profile['kanboard']['project_id']
+  end
+
   def run_tasks
-    tasks = Dir.glob('tasks/*.rb')
-    tasks = tasks.select { |t| profile['whitelist'].include?(task_name(t)) } if profile.has_key?('whitelist')
+    if @task_file
+      tasks = [@task_file]
+    else
+      tasks = Dir.glob('tasks/*.rb')
+      tasks = tasks.select { |t| profile['whitelist'].include?(task_name(t)) } if profile.has_key?('whitelist')
+      tasks = tasks.reject { |t| profile['blacklist'].include?(task_name(t)) } if profile.has_key?('blacklist')
+    end
 
     tasks.each do |task|
-      next if profile['blacklist'].include?(task_name(task))
-
-      project = KanboardProject.new('id' => profile['kanboard']['project_id'])
-      task_configuration = profile['configuration'][task_name(task)] || {}
+      project = KanboardProject.new('id' => project_id)
+      task_configuration = profile.fetch('configuration', {}).fetch(task_name(task), {})
 
       logger.info "Starting task #{task}"
       instance_eval File.read(task), task, 1
@@ -76,7 +111,7 @@ class Kansync
   end
 
   def load_profile
-    @profile = YAML.load_file ARGV[0]
+    @profile = YAML.load_file @profile_file
   end
 
   def prepare_logger
@@ -86,11 +121,6 @@ class Kansync
 
   def prepare_kanboard_connection
     @@kanboard_connection = RequestFactory.new(profile['connection']['kanboard'])
-  end
-
-  def wrong_usage!
-    puts "Usage #{$0} PROFILE\n  e.g. #{$0} profile/default.yml"
-    exit(WRONG_USAGE)
   end
 end
 

@@ -7,7 +7,7 @@ fi
 
 trap "exit 0" SIGINT SIGTERM;
 while true; do
-  ./kansync.rb $1
+  ./kansync.rb -p $1
   interval=${2:-600}
   echo "Sleeping for $interval seconds"
   sleep $interval 
