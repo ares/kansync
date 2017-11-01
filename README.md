@@ -18,7 +18,7 @@ profiles/default.yml.example and adjust the configuration.
 For one-off shots you can use kansync.rb directly, e.g.
 
 ```
-./kansync.rb profiles/marek.yml
+./kansync.rb -p profiles/marek.yml
 ```
 
 If you want to automate repeated runs, you can use kansync_loop script, the first argument is profile, the second one is interval which defaults
@@ -35,17 +35,17 @@ sudo docker build -t ares/kansync:latest .
 then you can run the container like this
 
 ```
-sudo docker run --name kansync --rm -i -t -v /home/ares/z/kansync/profiles/:/opt/app-root/profiles ares/kansync kansync_loop
+sudo docker run --name kansync --rm -i -t -v $PWD/profiles/:/opt/app-root/profiles ares/kansync kansync_loop
 ```
 
 that prints the usage, to run specific profile from directory you mounted, do this
 
 ```
-sudo docker run --name kansync --rm -i -t -v /home/ares/z/kansync/profiles/:/opt/app-root/profiles ares/kansync kansync_loop profiles/my_profile.yml
+sudo docker run --name kansync --rm -i -t -v $PWD/profiles/:/opt/app-root/profiles ares/kansync kansync_loop profiles/my_profile.yml
 ```
 
 By default the profile will be run every 600 seconds, you can customize the interval by additional parameter (value is in seconds)
 
 ```
-sudo docker run --name kansync --rm -i -t -v /home/ares/z/kansync/profiles/:/opt/app-root/profiles ares/kansync kansync_loop profiles/my_profile 60
+sudo docker run --name kansync --rm -i -t -v $PWD/profiles/:/opt/app-root/profiles ares/kansync kansync_loop profiles/my_profile 60
 ```
