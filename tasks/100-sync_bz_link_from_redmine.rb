@@ -9,7 +9,7 @@ project.current_tasks.each do |task|
       if !issue.bugzilla_id.empty?
         if !task.links?(issue.bugzilla_link)
           logger.debug "...... redmine issue is linked to #{issue.bugzilla_link}, syncing to kanboard task"
-          if task.create_link(issue.bugzilla_link, 'Redmine')
+          if task.create_link(issue.bugzilla_link, 'bugzilla')
             logger.debug '... done'
           else
             logger.error "... error saving the new task link for #{task.title}"
