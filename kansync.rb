@@ -9,6 +9,7 @@ require 'active_support/core_ext/hash/conversions.rb'
 require 'active_support/core_ext/numeric/time.rb'
 require 'pry'
 require 'optparse'
+require 'clamp'
 
 libdir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
@@ -26,43 +27,42 @@ require 'kanboard_user'
 require 'redmine_issue'
 require 'bugzilla'
 
-class Kansync
+module Kansync
+  def self.logger
+    @logger
+  end
+
+  def self.kanboard_connection
+    @kanboard_connection
+  end
+
+  def self.prepare_logger(level = Logger::DEBUG)
+    level ||= Logger::DEBUG
+    return @logger if @logger
+    @logger = Logger.new(STDOUT)
+    @logger.level = level
+  end
+
+  def self.prepare_kanboard_connection(connection_options)
+    return @kanboard_connection if @kanboard_connection
+    @kanboard_connection = RequestFactory.new(connection_options)
+  end
+
+  def self.setup(logger_level: Logger::DEBUG, kanboard_options:)
+    prepare_logger(logger_level)
+    prepare_kanboard_connection(kanboard_options)
+  end
+
+  class TaskRunner
   WRONG_USAGE = 1
   attr_reader :profile
 
-  def initialize
-    @options = parse_args!
-
+  def initialize(task_file:, profile_file:, project_id:)
+    @task_file = task_file
+    @profile_file = profile_file
+    @project_id = project_id
     load_profile
-    prepare_logger
-    prepare_kanboard_connection
-  end
-
-  def parse_args!
-    options = {}
-    parser = OptionParser.new do |opts|
-      opts.banner = 'Usage: kansync.rb [options]'
-
-      opts.on('-t', '--task=TASK_FILE', 'Task file') do |v|
-        @task_file = v
-      end
-
-      opts.on('-p', '--profile=PROFILE_FILE', 'Profile file') do |v|
-        @profile_file = v
-      end
-
-      opts.on('-P', '--project-id=PROJECT_ID', 'Project id') do |v|
-        @project_id = v
-      end
-    end
-    parser.parse!
-
-    unless @profile_file
-      puts 'Missing --profile option'
-      puts parser.help
-      exit(WRONG_USAGE)
-    end
-    options
+    Kansync.setup(logger_level: profile['logger_level'], kanboard_options: profile['connection']['kanboard'])
   end
 
   def project_id
@@ -88,20 +88,12 @@ class Kansync
     end
   end
 
-  def self.logger
-    @@logger
+  def kanboard_connection
+    Kansync.kanboard_connection
   end
 
   def logger
-    self.class.logger
-  end
-
-  def self.kanboard_connection
-    @@kanboard_connection
-  end
-
-  def kanboard_connection
-    @@kanboard_connection
+    Kansync.logger
   end
 
   private
@@ -114,17 +106,20 @@ class Kansync
     @profile = YAML.load_file @profile_file
   end
 
-  def prepare_logger
-    @@logger = Logger.new(STDOUT)
-    @@logger.level = @profile['logger_level'] || Logger::DEBUG
-  end
+end
+Clamp do
+  subcommand "task", "Run one or more tasks" do
+      option "--loud", :flag, "say it loud"
+      option ['-t', '--task'], 'TASK_FILE', 'Task file'
+      option ['-p', '--profile'], 'PROFILE_FILE', 'Profile file', required: true
+      option ['-P', '--project-id'], 'PROJECT_ID', 'Project id'
 
-  def prepare_kanboard_connection
-    @@kanboard_connection = RequestFactory.new(profile['connection']['kanboard'])
+      def execute
+        Kansync::TaskRunner.new(task_file: task, profile_file: profile, project_id: project_id).run_tasks
+      end
+    end
   end
 end
-
-Kansync.new.run_tasks
 
 # TODO need a separate script to create cards
 # TODO need a separate script to help with new iteration setup
