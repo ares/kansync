@@ -6,7 +6,7 @@ class RedmineIssue
     if url_or_id =~ /\A\d+\Z/
       @url = format(REDMINE_URL_FORMAT, redmine_id: url_or_id)
     else
-      @url = url_or_id
+      @url = url_or_id.sub(/\/\Z/, '')
     end
 
     @url = @url.chomp('/')

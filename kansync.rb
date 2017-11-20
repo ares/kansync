@@ -23,6 +23,8 @@ require 'kanboard_task'
 require 'kanboard_swimlane'
 require 'kanboard_external_link'
 require 'kanboard_user'
+require 'kanboard_category'
+require 'kanboard_mapper'
 
 require 'redmine_issue'
 require 'bugzilla'
@@ -87,7 +89,8 @@ Clamp do
     option ['-r', '--redmine-id'], 'REDMINE_ID', 'Redmine id', required: true
 
     def execute
-      RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).run
+      task = RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).create
+      puts "Kanboard task #{task.id} created"
     end
   end
 end
