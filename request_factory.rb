@@ -27,6 +27,11 @@ class RequestFactory
       req.body = body.to_json
     end
 
-    JSON.parse(response.body)['result']
+    parsed_body = JSON.parse(response.body)
+    if parsed_body['result']
+      return parsed_body['result']
+    else
+      raise "Error processing the request #{method} (#{params.inspect}): #{parsed_body['error'].inspect}"
+    end
   end
 end

@@ -2,17 +2,16 @@ class KanboardResource
   attr_reader :params, :id
 
   def initialize(params)
-    @@connection = Kansync.kanboard_connection
     @params = params
     @id = params['id']
   end
 
   def self.connection
-    @@connection
+    @connection = Kansync.kanboard_connection
   end
 
   def connection
-    @@connection
+    self.class.connection
   end
 
   def method_missing(name, *args, &block)

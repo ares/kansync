@@ -10,6 +10,9 @@ connection:
 kanboard:
   project_id: 1
 
+configuration:
+  backlog_swimlane_name: "Backlog"
+
 # default log level is debug, you can change it to info, warn, error, fatal
 # logger_level: debug
 
