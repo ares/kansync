@@ -18,7 +18,7 @@ profiles/default.yml.example and adjust the configuration.
 For one-off shots you can use kansync.rb directly, e.g.
 
 ```
-./kansync.rb -p profiles/marek.yml
+./kansync.rb task -p profiles/marek.yml
 ```
 
 If you want to automate repeated runs, you can use kansync_loop script, the first argument is profile, the second one is interval which defaults
