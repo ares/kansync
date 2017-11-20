@@ -27,6 +27,10 @@ require 'kanboard_user'
 require 'redmine_issue'
 require 'bugzilla'
 
+require 'profile'
+require 'redmine_to_kanboard'
+require 'task_runner'
+
 module Kansync
   def self.logger
     @logger
@@ -48,75 +52,42 @@ module Kansync
     @kanboard_connection = RequestFactory.new(connection_options)
   end
 
-  def self.setup(logger_level: Logger::DEBUG, kanboard_options:)
-    prepare_logger(logger_level)
-    prepare_kanboard_connection(kanboard_options)
-  end
-
-  class TaskRunner
-    WRONG_USAGE = 1
-    attr_reader :profile
-
-    def initialize(task_file:, profile_file:, project_id:)
-      @task_file = task_file
-      @profile_file = profile_file
-      @project_id = project_id
-      load_profile
-      Kansync.setup(logger_level: profile['logger_level'], kanboard_options: profile['connection']['kanboard'])
-    end
-
-    def project_id
-      @project_id ||= profile['kanboard']['project_id']
-    end
-
-    def run_tasks
-      if @task_file
-        tasks = [@task_file]
-      else
-        tasks = Dir.glob('tasks/*.rb')
-        tasks = tasks.select { |t| profile['whitelist'].include?(task_name(t)) } if profile.has_key?('whitelist')
-        tasks = tasks.reject { |t| profile['blacklist'].include?(task_name(t)) } if profile.has_key?('blacklist')
-      end
-
-      tasks.each do |task|
-        project = KanboardProject.new('id' => project_id)
-        task_configuration = profile.fetch('configuration', {}).fetch(task_name(task), {})
-
-        logger.info "Starting task #{task}"
-        instance_eval File.read(task), task, 1
-        logger.info "Finished task #{task}\n"
-      end
-    end
-
-    def kanboard_connection
-      Kansync.kanboard_connection
-    end
-
-    def logger
-      Kansync.logger
-    end
-
-    private
-
-    def task_name(filename)
-      File.basename(filename, '.rb')
-    end
-
-    def load_profile
-      @profile = YAML.load_file @profile_file
-    end
+  def self.setup(profile)
+    prepare_logger(profile.logger_level)
+    prepare_kanboard_connection(profile.kanboard_options)
   end
 end
 
 Clamp do
-  subcommand "task", "Run one or more tasks" do
-    option "--loud", :flag, "say it loud"
-    option ['-t', '--task'], 'TASK_FILE', 'Task file'
+  def self.profile_options
     option ['-p', '--profile'], 'PROFILE_FILE', 'Profile file', required: true
     option ['-P', '--project-id'], 'PROJECT_ID', 'Project id'
+  end
+
+  def profile_object
+    return @profile_object if @profile_object
+    @profile_object = Profile.new(profile).tap do |profile|
+      profile.project_id = project_id if project_id
+    end
+    Kansync.setup(@profile_object)
+    @profile_object
+  end
+
+  subcommand "task", "Run one or more tasks" do
+    option ['-t', '--task'], 'TASK_FILE', 'Task file'
+    profile_options
 
     def execute
-      Kansync::TaskRunner.new(task_file: task, profile_file: profile, project_id: project_id).run_tasks
+      TaskRunner.new(profile: profile_object, task_file: task).run_tasks
+    end
+  end
+
+  subcommand 'redmine_to_kanboard', 'Clone Redmine ticket to Kanboard' do
+    profile_options
+    option ['-r', '--redmine-id'], 'REDMINE_ID', 'Redmine id', required: true
+
+    def execute
+      RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).run
     end
   end
 end

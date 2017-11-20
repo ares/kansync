@@ -24,6 +24,24 @@ For one-off shots you can use kansync.rb directly, e.g.
 If you want to automate repeated runs, you can use kansync_loop script, the first argument is profile, the second one is interval which defaults
 to 1 hour. The script tries to change pwd to /opt/app-root which is the directory, that docker container uses (see below).
 
+
+## redmine_to_kanboard
+
+There is a command to convert a Redmine ticket to a Kanboard task.
+
+Before using, one needs to configure the `backlog_swimlane_name` in profile configuration:
+
+```
+configuration:
+  backlog_swimlane_name: "Backlog"
+```
+
+Usage:
+
+```
+./kansync.rb redmine_to_kanboard -p profiles/remote.yml --redmine-id 12345
+```
+
 ## Running it using docker
 
 to build an image, do a something like
