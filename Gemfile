@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+gem 'clamp'
 gem 'faraday'
 gem 'awesome_print'
 gem 'activesupport'

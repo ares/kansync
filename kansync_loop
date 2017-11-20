@@ -1,13 +1,13 @@
 cd /opt/app-root
 
 if [ -z "$1" ]; then
-  ./kansync.rb
+  ./kansync.rb --help
   exit
 fi
 
 trap "exit 0" SIGINT SIGTERM;
 while true; do
-  ./kansync.rb -p $1
+  ./kansync.rb task -p $1
   interval=${2:-600}
   echo "Sleeping for $interval seconds"
   sleep $interval 
