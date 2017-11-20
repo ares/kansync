@@ -34,7 +34,7 @@ project.current_tasks.each do |task|
 
     kanboard_columns = task.redmine_links.map do |redmine_link|
       issue = RedmineIssue.new(redmine_link.url)
-      map.find { |_, status_ids| status_ids.include?(issue.status_id) }.first
+      map.find { |_, status_ids| status_ids.include?(issue.status_id) }
     end
 
     logger.debug "Found following redmine statuses for this task: #{kanboard_columns.join(', ')}"
