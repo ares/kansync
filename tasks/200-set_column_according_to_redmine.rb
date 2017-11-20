@@ -41,7 +41,7 @@ project.current_tasks.each do |task|
 
     name = kanboard_columns.sort { |a,b| map.keys.index(a) <=> map.keys.index(b) }.first
 
-    change_column = task.column_id != KanboardColumn.find_by_name(task.connection, task.project_id, name).id
+    change_column = task.column_id != KanboardColumn.find_by_name(task.project_id, name).id
     blockers = task_configuration['blockers'][name] || {}
     blocked_by_tag = blockers['tag'].kind_of?(Array) && task.tags.any? { |tag| blockers['tag'].include?(tag) }
     blocked_by_state = blockers['column'].kind_of?(Array) && blockers['column'].any? do |blocked_column|

@@ -4,6 +4,7 @@ class RedmineIssue
   def initialize(url)
     @url = url
 
+    @url = @url.chomp('/')
     response = Faraday.get(@url + '.json')
     @attrs = JSON.parse(response.body)['issue']
   end
@@ -26,5 +27,10 @@ class RedmineIssue
 
   def updated_on
     @attrs['updated_on']
+  end
+
+  private
+  def name_attr(attr)
+    @attrs.fetch(attr, {})['name']
   end
 end

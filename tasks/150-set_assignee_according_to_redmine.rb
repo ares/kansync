@@ -21,10 +21,14 @@ project.current_tasks.each do |task|
     name = map.has_key?(last_issue.assigned_to) ? map[last_issue.assigned_to] : last_issue.assigned_to
     logger.debug "Picked following kanboard_name: #{name}"
 
-    user = KanboardUser.find_by_name(task.connection, name)
+    user = KanboardUser.find_by_name(name)
     if !user.nil? && task.owner_id != user.id
       logger.info "Setting the owner #{name} for this task"
-      task.set_owner(name)
+      begin
+        task.set_owner(name)
+      rescue => e
+        logger.error "Setting the owner failed with #{e.to_s}"
+      end
     end
 
     logger.debug "\n"
