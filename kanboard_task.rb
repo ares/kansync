@@ -10,12 +10,22 @@ class KanboardTask < KanboardResource
     new connection.request('getTask', 'task_id' => id)
   end
 
+  def self.update(params)
+    connection.request('updateTask', params)
+  end
+
   def redmine_links?
     redmine_links.any?
   end
 
   def redmine_links
     external_links.select { |link| link.url.include?(REDMINE_URL)}
+  end
+
+  def redmine_issues
+    redmine_links.map do |link|
+      RedmineIssue.new(link.url)
+    end
   end
 
   def github_links?
@@ -32,6 +42,25 @@ class KanboardTask < KanboardResource
 
   def bugzilla_links
     external_links.select { |link| link.url.include?(BUGZILLA_URL)}
+  end
+
+  def bugzillas
+    bugzila_links.map { |link| Bugzilla.new(link) }
+  end
+
+  def sync_bugzilla_links
+    return unless redmine_links?
+    redmine_issues.map do |redmine_issue|
+      next if redmine_issue.bugzilla_id.empty?
+      next if links?(redmine_issue.bugzilla_link)
+      create_link(redmine_issue.bugzilla_link, 'bugzilla')
+    end
+  end
+
+  def create_redmine_links(*links)
+    links.each do |link|
+      create_link(link, 'redmine')
+    end
   end
 
   def links?(url)
