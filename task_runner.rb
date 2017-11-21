@@ -18,6 +18,7 @@ class TaskRunner
       tasks = Dir.glob('tasks/*.rb')
       tasks = tasks.select { |t| profile.whitelist.include?(task_name(t)) } if profile.whitelist
       tasks = tasks.reject { |t| profile.blacklist.include?(task_name(t)) } if profile.blacklist
+      tasks.sort!
     end
 
     tasks.each do |task|
