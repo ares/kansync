@@ -89,7 +89,7 @@ Clamp do
     option ['-r', '--redmine-id'], 'REDMINE_ID', 'Redmine id', required: true
 
     def execute
-      task = RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).create
+      task = RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).run
       puts "Kanboard task #{task.id} created"
     end
   end
