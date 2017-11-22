@@ -1,8 +1,9 @@
 class RedmineToKanboard
-  def initialize(profile:, redmine_id: nil, kanboard_task: nil)
+  def initialize(profile:, redmine_id: nil, kanboard_task: nil, tags: nil)
     @profile = profile
     @redmine_id = redmine_id
     @kanboard_task = kanboard_task
+    @tags = tags || []
   end
 
   def run
@@ -83,7 +84,7 @@ class RedmineToKanboard
   end
 
   def task_tags
-    []
+    @tags
   end
 
   def category_id
