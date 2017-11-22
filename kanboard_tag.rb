@@ -1,14 +1,13 @@
 require 'kanboard_resource'
 
-class KanboardCategory < KanboardResource
+class KanboardTag < KanboardResource
   def self.create(project_id, name)
-    id = connection.request('createCategory', project_id: project_id, name: name)
-    new connection.request('getCategory', [id])
+    new(connection.request('createTag', [project_id, name]))
   end
 
   def self.find_by_name(project_id, name)
     all = get_all(project_id)
-    all.find { |category| category.name.downcase == name.downcase }
+    all.find { |tag| tag.name.downcase == name.downcase }
   end
 
   def self.find_or_create(project_id, name)
@@ -16,7 +15,7 @@ class KanboardCategory < KanboardResource
   end
 
   def self.get_all(project_id)
-    connection.request('getAllCategories', project_id: project_id).map do |data|
+    connection.request('getTagsByProject', [project_id]).map do |data|
       new(data)
     end
   end

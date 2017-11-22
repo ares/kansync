@@ -24,6 +24,7 @@ require 'kanboard_swimlane'
 require 'kanboard_external_link'
 require 'kanboard_user'
 require 'kanboard_category'
+require 'kanboard_tag'
 require 'kanboard_mapper'
 
 require 'redmine_issue'
@@ -87,9 +88,10 @@ Clamp do
   subcommand 'redmine_to_kanboard', 'Clone Redmine ticket to Kanboard' do
     profile_options
     option ['-r', '--redmine-id'], 'REDMINE_ID', 'Redmine id', required: true
+    option ['-t', '--tag'], 'TAG', 'tag', multivalued: true
 
     def execute
-      task = RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id).run
+      task = RedmineToKanboard.new(profile: profile_object, redmine_id: redmine_id, tags: tag_list).run
       puts "Kanboard task #{task.id} created"
     end
   end
