@@ -29,7 +29,6 @@ class RedmineToKanboard
   end
 
   def sync_kanboard_task
-    @kanboard_task.create_redmine_links(@redmine_issue.url)
     @kanboard_task.sync_bugzilla_links
   end
 
@@ -51,6 +50,8 @@ class RedmineToKanboard
                                          'swimlane_id' => swimlane_id,
                                          'category_id' => category_id,
                                          'tags' => task_tags)
+    @kanboard_task.create_redmine_links(@redmine_issue.url)
+    @kanboard_task
   end
 
   def update_kanboard_task
