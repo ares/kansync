@@ -10,7 +10,7 @@ task_configuration = {
 existing_triage_title = project.search_tasks('status:open swimlane:"' + project.current_swimlane.name + '" column:"Backlog"').map(&:title)
 
 task_configuration['users'].each do |user, count|
-  new_title = "Triage 15 BZs - #{user} (0/#{count})"
+  new_title = "Triage #{count} BZs - #{user} (0/#{count})"
   if existing_triage_title.include?(new_title)
     logger.debug "Skipping #{user} triage card, it's already there"
   else
