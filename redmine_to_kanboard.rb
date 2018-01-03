@@ -43,12 +43,15 @@ class RedmineToKanboard
   end
 
   def create_kanboard_task
+    redmine_assignee = KanboardUser.find_by_name(@redmine_issue.assigned_to)
+    owner_id = redmine_assignee.id if redmine_assignee
     @kanboard_task = KanboardTask.create('title' => task_title,
                                          'project_id' => project_id,
                                          'color_id' => color_id,
                                          'description' => task_description,
                                          'swimlane_id' => swimlane_id,
                                          'category_id' => category_id,
+                                         'owner_id' => owner_id,
                                          'tags' => task_tags)
     @kanboard_task.create_redmine_links(@redmine_issue.url)
     @kanboard_task
