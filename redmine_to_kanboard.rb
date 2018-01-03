@@ -77,7 +77,7 @@ class RedmineToKanboard
   end
 
   def task_title
-    @redmine_issue.subject
+    "RM \##{@redmine_issue.id}: #{@redmine_issue.subject}"
   end
 
   def task_description

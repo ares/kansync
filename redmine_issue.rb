@@ -14,6 +14,10 @@ class RedmineIssue
     @attrs = JSON.parse(response.body)['issue']
   end
 
+  def id
+    @attrs.fetch('id')
+  end
+
   def subject
     @attrs.fetch('subject')
   end
