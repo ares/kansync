@@ -1,69 +1,67 @@
-class RedmineIssue
+class GithubPr
   attr_reader :url
-  REDMINE_URL_FORMAT = "http://projects.theforeman.org/issues/%{redmine_id}"
+  GITHUB_API_FQDN = "https://api.github.com"
 
-  def initialize(url_or_id)
-    if url_or_id =~ /\A\d+\Z/
-      @url = format(REDMINE_URL_FORMAT, redmine_id: url_or_id)
-    else
-      @url = url_or_id.sub(/\/\Z/, '')
-    end
-
-    @url = @url.chomp('/')
-    response = Faraday.get(@url + '.json')
-    @attrs = JSON.parse(response.body)['issue']
+  def initialize(url, username = '', password = '')
+    @url = url.chomp('/')
+    connection = Faraday.new(GITHUB_API_FQDN)
+    connection.basic_auth(username, password) unless username.empty? && password.empty?
+    response = connection.get(url)
+    @attrs = JSON.parse(response.body)
   end
 
   def id
-    @attrs.fetch('id')
+    @attrs.fetch('number')
   end
 
-  def subject
-    @attrs.fetch('subject')
+  def title
+    @attrs.fetch('title')
   end
 
-  def description
-    @attrs.fetch('description')
+  def redmine_issue
+    issue = title.match(/#(\d+)/).try(:[], 1)
+    if issue
+      RedmineIssue.new(issue)
+    else
+      nil
+    end
   end
 
-  def project_name
-    name_attr('project')
+  def user
+    @attrs.fetch('user').fetch('login')
   end
 
-  def tracker_name
-    name_attr('tracker')
+  def repository
+    base_attr('repo').fetch('name')
   end
 
-  def category_name
-    name_attr('category')
+  def owner
+    base_attr('repo').fetch('owner', {})['login']
   end
 
-  def bugzilla
-    @bugzilla ||= Bugzilla.new(bugzilla_link) if bugzilla_link
+  def state
+    @attrs.fetch('state')
   end
 
-  def bugzilla_id
-    @attrs['custom_fields'].find { |f| f['name'] == 'Bugzilla link'}['value']
+  def opened?
+    state == 'open'
   end
 
-  def bugzilla_link
-    "https://bugzilla.redhat.com/show_bug.cgi?id=#{bugzilla_id}" if bugzilla_id
+  def closed?
+    state == 'closed'
   end
 
-  def status_id
-    @attrs['status']['id'].to_i
-  end
-
-  def assigned_to
-    name_attr('assigned_to')
-  end
-
-  def updated_on
-    @attrs['updated_on']
+  def labels
+    @attrs.fetch('labels', []).map { |label| label['name'] }
   end
 
   private
-  def name_attr(attr)
-    @attrs.fetch(attr, {})['name']
+
+  def head_attr(attr)
+    @attrs.fetch('head', {})[attr]
+  end
+
+  def base_attr(attr)
+    @attrs.fetch('base', {})[attr]
   end
 end

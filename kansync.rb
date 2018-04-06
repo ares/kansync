@@ -29,6 +29,7 @@ require 'kanboard_mapper'
 
 require 'redmine_issue'
 require 'bugzilla'
+require 'github_pr'
 
 require 'profile'
 require 'redmine_to_kanboard'
