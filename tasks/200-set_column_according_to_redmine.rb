@@ -39,13 +39,12 @@ project.current_tasks.each do |task|
 
     logger.debug "Found following redmine statuses for this task: #{kanboard_columns.join(', ')}"
 
-    name = kanboard_columns.sort { |a,b| map.keys.index(a) <=> map.keys.index(b) }.first
-
+    name = kanboard_columns.sort { |a,b| map.keys.index(a) <=> map.keys.index(b) }.first.try(:first)
     change_column = task.column_id != KanboardColumn.find_by_name(task.project_id, name).id
     blockers = task_configuration['blockers'][name] || {}
     blocked_by_tag = blockers['tag'].kind_of?(Array) && task.tags.any? { |tag| blockers['tag'].include?(tag) }
     blocked_by_state = blockers['column'].kind_of?(Array) && blockers['column'].any? do |blocked_column|
-      task.column_id == KanboardColumn.find_by_name(task.connection, task.project_id, blocked_column).id
+      task.column_id == KanboardColumn.find_by_name(task.project_id, blocked_column).id
     end
     blocked = blocked_by_tag || blocked_by_state
 
