@@ -14,8 +14,10 @@ logger.info "starting to process data, this can take some time"
 project.current_tasks.each do |task|
   logger.debug "processing #{task.title}"
   tags = task.tags.empty? ? '' : ' ' + task.tags.map {|t| "##{t}" }.join(' ')
-  title = task.title + tags
+  link = (task.redmine_links + task.github_links + task.bugzilla_links).first.try(:url)
+  link = link.nil? ? '' : ' ' + link
 
+  title = task.title + link
   if task.assignee_name.nil?
     unassigned << title
     next
