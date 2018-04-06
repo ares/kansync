@@ -23,7 +23,7 @@ project.current_tasks.each do |task|
 
     user = KanboardUser.find_by_name(name)
     if !user.nil? && task.owner_id != user.id
-      logger.info "Setting the owner #{name} for this task"
+      logger.warn "Setting the owner #{name} for this task"
       begin
         task.set_owner(name)
       rescue => e

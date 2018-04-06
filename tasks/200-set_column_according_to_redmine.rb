@@ -49,7 +49,7 @@ project.current_tasks.each do |task|
     blocked = blocked_by_tag || blocked_by_state
 
     if change_column && !blocked
-      logger.info "Setting the column #{name} for this task"
+      logger.warn "Setting the column #{name} for this task"
       task.move_to_column(name)
     end
 

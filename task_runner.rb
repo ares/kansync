@@ -16,8 +16,11 @@ class TaskRunner
       tasks = [@task_file]
     else
       tasks = Dir.glob('tasks/*.rb')
+      logger.debug "Available tasks: #{tasks.join(', ')}"
       tasks = tasks.select { |t| profile.whitelist.include?(task_name(t)) } if profile.whitelist
+      logger.debug "Remaining tasks after whitelist applied: #{tasks.join(', ')}"
       tasks = tasks.reject { |t| profile.blacklist.include?(task_name(t)) } if profile.blacklist
+      logger.debug "Remaining tasks after blacklist applied: #{tasks.join(', ')}"
       tasks.sort!
     end
 
