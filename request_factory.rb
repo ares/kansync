@@ -4,7 +4,7 @@ class RequestFactory
     @user = connection_options['user']
     @pw = connection_options['pw']
     @counter = 0
-    @connection = conn = Faraday.new(:url => @url) do |faraday|
+    @connection = Faraday.new(:url => @url) do |faraday|
       # faraday.response :logger
       faraday.basic_auth(@user, @pw)
       faraday.adapter Faraday.default_adapter
