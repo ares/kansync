@@ -10,18 +10,57 @@ connection:
 kanboard:
   project_id: 1
 
-configuration:
-  backlog_swimlane_name: "Backlog"
+github:
+  username: email@of.user.com
+  password: Pa$$word
 
 # default log level is debug, you can change it to info, warn, error, fatal
 # logger_level: debug
 
 # if whitelist is specified, only listed tasks will be executed
 # if no whitelist is specified, all tasks will be executed
-# whitelist: []
+whitelist:
+  - 050-sync_github_tags
+  - 070-sync_redmine_link_from_github
+  - 100-sync_bz_link_from_redmine
+  - 150-set_assignee_according_to_redmine
+  - 200-set_column_according_to_redmine
 
 # you can further limit what tasks will not be executed by blacklist
 # if whitelist was specified, tasks can be explicitly ignored by blacklist
 # blacklist overrides whitelist
-# if whitelist was not specified and blacklist was set to [ 'some' ], all tasks except tasks/sone.rb would be executed
 blacklist: []
+
+configuration:
+  backlog_swimlane_name: "Current iteration (29)"
+  050-sync_github_tags:
+    tags_map:
+      Demo worthy: 'needs_demo'
+      Waiting on contributor: 'waiting_on_contributor'
+    sync_tags:
+      - waiting_on_contributor
+      - needs_demo
+      - needs_rebase
+    auto_remove_tags:
+      - waiting_on_contributor
+      - needs_rebase
+  070-sync_redmine_link_from_github: {}
+  100-sync_bz_link_from_redmine: {}
+  150-set_assignee_according_to_redmine:
+    # redmine user name: kanboard user name
+    map:
+      Marek Hulán: Marek Hulan
+  200-set_column_according_to_redmine:
+    map:
+      # kanboard column: redmine state id, see task 200 for ids meanings
+      Backlog: [1, 2, 9, 11, 8]
+      Review: [7]
+      Done: [4, 5]
+    blockers:
+      # don't move tasks to review column if it has tag woc or it must be rebased or if it's already in done column
+      Review:
+        tag: ['waiting_on_contributor', 'needs_rebase']
+        column: ['Done']
+      # never move task to backlog automatically, once it's already in progress
+      Backlog:
+        column: ['Work in progress']
