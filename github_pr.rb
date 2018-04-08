@@ -2,11 +2,19 @@ class GithubPr
   attr_reader :url
   GITHUB_API_FQDN = "https://api.github.com"
 
+  # url expecterd in format https://github.com/theforeman/foreman/pull/123
   def initialize(url, username = '', password = '')
-    @url = url.chomp('/')
+    data = url.match /\Ahttps:\/\/github.com\/(.*)\/(.*)\/pull\/(\d+)\Z/
+    if data
+      owner, repository, pr_number = data[1], data[2], data[3]
+    else
+      logger.error "Invalid github PR link #{url}, skipping"
+      raise "invalid github URL"
+    end
+    @url = "/repos/#{owner}/#{repository}/pulls/#{pr_number}"
     connection = Faraday.new(GITHUB_API_FQDN)
     connection.basic_auth(username, password) unless username.empty? && password.empty?
-    response = connection.get(url)
+    response = connection.get(@url)
     @attrs = JSON.parse(response.body)
   end
 
@@ -49,6 +57,18 @@ class GithubPr
 
   def closed?
     state == 'closed'
+  end
+
+  def mergeable?
+    @attrs.fetch('mergeable')
+  end
+
+  def merged?
+    @attrs.fetch('merged')
+  end
+
+  def needs_rebase?
+    !mergeable? && !merged?
   end
 
   def labels

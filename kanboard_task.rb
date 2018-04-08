@@ -101,6 +101,11 @@ class KanboardTask < KanboardResource
     connection.request('getTaskTags', [@id]).map(&:last)
   end
 
+  def set_tags(tags)
+    params = [ project_id, @id, tags ]
+    connection.request('setTaskTags', params)
+  end
+
   def owner
     KanboardUser.find_by_id(self.owner_id)
   end
