@@ -44,7 +44,7 @@ project.current_tasks.each do |task|
     # name overrides based on task tags
     # TODO following override would be good to make configurable
     if name == 'Review' && (task.tags.include?('needs_rebase') || task.tags.include?('waiting_on_contributor'))
-      logger.warn 'Overriding new state to Work in progress because of tag needs_rebase or waiting_on_contributor'
+      logger.info 'Overriding new state to Work in progress because of tag needs_rebase or waiting_on_contributor'
       name = 'Work in progress'
     end
 
