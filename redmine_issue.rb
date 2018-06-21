@@ -1,6 +1,6 @@
 class RedmineIssue
   attr_reader :url
-  REDMINE_URL_FORMAT = "http://projects.theforeman.org/issues/%{redmine_id}"
+  REDMINE_URL_FORMAT = "https://projects.theforeman.org/issues/%{redmine_id}"
 
   def initialize(url_or_id)
     if url_or_id =~ /\A\d+\Z/
