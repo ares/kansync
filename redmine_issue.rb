@@ -9,7 +9,7 @@ class RedmineIssue
       @url = url_or_id.sub(/\/\Z/, '')
     end
 
-    @url = @url.chomp('/')
+    @url = @url.chomp('/').sub('http://', 'https://')
     response = Faraday.get(@url + '.json')
     @attrs = JSON.parse(response.body)['issue']
   end
