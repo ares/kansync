@@ -38,6 +38,10 @@ class RedmineIssue
     name_attr('category')
   end
 
+  def github_links
+    @attrs['custom_fields'].select { |f| f['name'] == 'Pull request' }.first['value']
+  end
+
   def bugzilla
     @bugzilla ||= Bugzilla.new(bugzilla_link) if bugzilla_link
   end

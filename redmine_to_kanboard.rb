@@ -30,6 +30,7 @@ class RedmineToKanboard
 
   def sync_kanboard_task
     @kanboard_task.sync_bugzilla_links
+    @kanboard_task.sync_github_links
   end
 
   private

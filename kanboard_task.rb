@@ -57,6 +57,17 @@ class KanboardTask < KanboardResource
     end
   end
 
+  def sync_github_links
+    return unless redmine_links?
+    redmine_issues.map do |redmine_issue|
+      next if redmine_issue.github_links.empty?
+      redmine_issue.github_links.each do |github_link|
+        next if links?(github_link)
+        create_link(github_link, 'github')
+      end
+    end
+  end
+
   def create_redmine_links(*links)
     links.each do |link|
       create_link(link, 'redmine')
