@@ -34,8 +34,11 @@ project.current_tasks.each do |task|
 
     kanboard_columns = task.redmine_links.map do |redmine_link|
       issue = RedmineIssue.new(redmine_link.url)
-      map.find { |_, status_ids| status_ids.include?(issue.status_id) }
+      found = map.find { |_, status_ids| status_ids.include?(issue.status_id) }
+      logger.error "Couldn't find column name for #{redmine_link.url} and its status id #{issue.status_id}, map of redmine states needs to be updated!" if found.nil?
+      found
     end
+    kanboard_columns.compact!
 
     logger.debug "Found following redmine statuses for this task: #{kanboard_columns.join(', ')}"
 
