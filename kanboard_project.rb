@@ -5,6 +5,10 @@ class KanboardProject < KanboardResource
     KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[0])
   end
 
+  def previous_swimlane
+    KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[2])
+  end
+
   def current_tasks
     search_tasks(%Q(status:open swimlane:"#{current_swimlane.name}"))
   end

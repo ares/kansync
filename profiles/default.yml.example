@@ -32,7 +32,7 @@ whitelist:
 blacklist: []
 
 configuration:
-  backlog_swimlane_name: "Current iteration (29)"
+  backlog_swimlane_name: "Current iteration (40)"
   050-sync_github_tags:
     tags_map:
       Demo worthy: 'needs_demo'
