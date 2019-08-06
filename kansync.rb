@@ -14,6 +14,7 @@ require 'clamp'
 libdir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 
+require 'utils'
 require 'request_factory'
 
 require 'kanboard_resource'
@@ -56,9 +57,14 @@ module Kansync
     @kanboard_connection = RequestFactory.new(connection_options)
   end
 
+  def self.prepare_bz_connection(connection_options)
+    Bugzilla.set_options(connection_options)
+  end
+
   def self.setup(profile)
     prepare_logger(profile.logger_level)
     prepare_kanboard_connection(profile.kanboard_options)
+    prepare_bz_connection(profile.bugzilla_options)
   end
 end
 

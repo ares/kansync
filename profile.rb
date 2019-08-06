@@ -1,6 +1,6 @@
 class Profile
   attr_accessor :project_id, :kanboard_options, :logger_level, :task_configuration,
-                :whitelist, :blacklist, :github_options,
+                :whitelist, :blacklist, :github_options, :bugzilla_options
                 :backlog_swimlane_name
 
   def initialize(profile_file)
@@ -24,6 +24,7 @@ class Profile
     @whitelist = @data['whitelist']
     @blacklist = @data['blacklist']
     @github_options = @data['github']
+    @bugzilla_options = @data['bugzilla']
   end
 end
 

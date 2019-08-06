@@ -14,6 +14,21 @@ class KanboardTask < KanboardResource
     connection.request('updateTask', params)
   end
 
+  def move_to_position(position, params = {})
+    params = {
+      'position' => position,
+      'project_id' => (params['project_id'] || @params['project_id']).to_i,
+      'task_id' => (params['task_id'] || @params['id']).to_i,
+      'swimlane_id' => (params['swimlane_id'] || @params['swimlane_id']).to_i,
+      'column_id' => (params['column_id'] || @params['column_id']).to_i,
+    }
+    connection.request('moveTaskPosition', params)
+  end
+
+  def move_to_top
+    move_to_position(1)
+  end
+
   def redmine_links?
     redmine_links.any?
   end
@@ -44,8 +59,12 @@ class KanboardTask < KanboardResource
     external_links.select { |link| link.url.include?(BUGZILLA_URL)}
   end
 
+  def bugzilla_ids
+    bugzilla_links.map { |link| link.url.gsub(/.*?(\d+)$/, '\1') }
+  end
+
   def bugzillas
-    bugzila_links.map { |link| Bugzilla.new(link) }
+    bugzila_links.map { |link| Bugzilla.load(link) }
   end
 
   def sync_bugzilla_links
@@ -105,7 +124,7 @@ class KanboardTask < KanboardResource
   end
 
   def set_complexity(complexity)
-    connection.request('updateTask', { 'id' => @id, 'complexity' => complexity })
+    connection.request('updateTask', { 'id' => @id, 'score' => complexity })
   end
 
   def tags
