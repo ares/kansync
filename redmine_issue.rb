@@ -43,7 +43,7 @@ class RedmineIssue
   end
 
   def bugzilla
-    @bugzilla ||= Bugzilla.new(bugzilla_link) if bugzilla_link
+    @bugzilla ||= Bugzilla.load(bugzilla_link) if bugzilla_link
   end
 
   def bugzilla_id

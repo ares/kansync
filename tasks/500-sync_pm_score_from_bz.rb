@@ -7,7 +7,7 @@ project.current_tasks.each do |task|
     logger.info "... found #{task.bugzilla_links.size} bugzilla links"
 
     total_score = task.bugzilla_links.inject(0) do |sum, bugzilla_link|
-      sum += Bugzilla.new(bugzilla_link.url).pm_score
+      sum += Bugzilla.load(bugzilla_link.url).pm_score
     end
 
     logger.info "Setting the complexity #{total_score} for this task"
