@@ -14,6 +14,12 @@ github:
   username: email@of.user.com
   password: Pa$$word
 
+# Bugzilla api_key can be generated in Bugzilla Account Menu (top right) > Preferences > API Keys tab
+# https://bugzilla.redhat.com/userprefs.cgi?tab=apikey
+
+bugzilla:
+  api_key: youR4aPi2key424OIJ2bhJ
+
 # default log level is debug, you can change it to info, warn, error, fatal
 # logger_level: debug
 
@@ -25,6 +31,7 @@ whitelist:
   - 100-sync_bz_link_from_redmine
   - 150-set_assignee_according_to_redmine
   - 200-set_column_according_to_redmine
+  - 600-sync_bz_bugs_to_triage
 
 # you can further limit what tasks will not be executed by blacklist
 # if whitelist was specified, tasks can be explicitly ignored by blacklist
@@ -64,3 +71,8 @@ configuration:
       # never move task to backlog automatically, once it's already in progress
       Backlog:
         column: ['Work in progress']
+  600-sync_bz_bugs_to_triage:
+    color: 'amber'
+    tag: 'Triage'
+    bz_filter:
+      component: 'Hammer'
