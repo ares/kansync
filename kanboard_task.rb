@@ -60,7 +60,7 @@ class KanboardTask < KanboardResource
   end
 
   def bugzilla_ids
-    bugzilla_links.map { |link| link.url.gsub(/.*?(\d+)$/, '\1') }
+    bugzilla_links.map { |link| link.url.gsub(/.*?(\d+)$/, '\1').to_i }
   end
 
   def bugzillas

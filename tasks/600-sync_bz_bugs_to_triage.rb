@@ -15,13 +15,14 @@ default_configuration = {
   'color' => 'amber',
   'tag' => 'Triage',
   'create_on_top' => true,
+  'done_column' => 'Done',
   'bz_filter' => {
     'bug_status' => ['NEW', 'ASSIGNED'],
     'query_format' => 'advanced',
     'classification' => 'Red Hat',
     'product' => 'Red Hat Satellite 6',
     'component' => 'My Component',
-    'keywords' => 'Tracking-',
+    'keywords' => 'Tracking, ',
     'keywords_type' => 'nowords',
     'f2' => 'component',
     'f3' => 'flagtypes.name',
@@ -33,13 +34,18 @@ default_configuration = {
 
 task_configuration = default_configuration.deep_merge(task_configuration)
 
-existing_triage_tasks = project.current_tasks(filter: "tag:\"#{task_configuration['tag']}\"").map do |task|
-  task.bugzilla_ids.map(&:to_i)
+existing_triage_tasks = project.current_tasks(filter: "tag:\"#{task_configuration['tag']}\"")
+existing_triage_bzs = existing_triage_tasks.map do |task|
+  task.bugzilla_ids
 end.flatten.uniq
 
-Bugzilla.search(task_configuration['bz_filter']).each do |bz|
+bugs_to_triage = Bugzilla.search(task_configuration['bz_filter'])
+bz_ids_to_triage = bugs_to_triage.map(&:id)
+
+# add new untriaged tasks
+bugs_to_triage.each do |bz|
   logger.info "Processing ##{bz.id} #{bz.summary}"
-  if existing_triage_tasks.include?(bz.id)
+  if existing_triage_bzs.include?(bz.id)
     logger.debug "Skipping ##{bz.id} triage task, it's already there"
   else
     logger.info "Creating new triage task for ##{bz.id}"
@@ -52,5 +58,14 @@ Bugzilla.search(task_configuration['bz_filter']).each do |bz|
     )
     task.create_link(bz.url, 'Bugzilla')
     task.move_to_top if task_configuration['create_on_top']
+  end
+end
+
+# remove tasks that were already triaged
+logger.info('Checking tasks that were already triaged')
+existing_triage_tasks.each do |task|
+  if (task.bugzilla_ids & bz_ids_to_triage).empty?
+    logger.info("Task #{task.id} was already triaged. Moving it to the #{default_configuration['done_column']} column")
+    task.move_to_column(default_configuration['done_column'])
   end
 end
