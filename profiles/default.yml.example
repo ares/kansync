@@ -31,7 +31,7 @@ whitelist:
   - 100-sync_bz_link_from_redmine
   - 150-set_assignee_according_to_redmine
   - 200-set_column_according_to_redmine
-  - 600-sync_bz_bugs_to_triage
+  - 400-sync_bz_bugs_to_triage
 
 # you can further limit what tasks will not be executed by blacklist
 # if whitelist was specified, tasks can be explicitly ignored by blacklist
