@@ -1,5 +1,5 @@
 # Override the task configuration in the profile:
-#   600-sync_bz_bugs_to_triage:
+#   400-sync_bz_bugs_to_triage:
 #     color: 'amber'
 #     tag: 'Triage'
 #     bz_filter:
