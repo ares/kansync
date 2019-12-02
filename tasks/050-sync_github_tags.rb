@@ -38,8 +38,13 @@ project.current_tasks.each do |task|
         next
       end
 
-      custom_labels = pr.needs_rebase? ? ['needs_rebase'] : []
-      custom_labels + pr.labels
+      labels = []
+      # closed PRs should be ignored entirely, we return no labels for them
+      unless pr.closed?
+        custom_labels = pr.needs_rebase? ? ['needs_rebase'] : []
+        labels = custom_labels + pr.labels
+      end
+      labels
     end
   end
 
