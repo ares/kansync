@@ -71,7 +71,7 @@ configuration:
       # never move task to backlog automatically, once it's already in progress
       Backlog:
         column: ['Work in progress']
-  600-sync_bz_bugs_to_triage:
+  400-sync_bz_bugs_to_triage:
     color: 'amber'
     tag: 'Triage'
     done_column: 'Done'
