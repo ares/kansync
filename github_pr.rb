@@ -60,7 +60,8 @@ class GithubPr
   end
 
   def mergeable?
-    @attrs.fetch('mergeable')
+    # Github returns null for mergable while it's calculating mergability, treat PRs as mergable until proven otherwise
+    @attrs.fetch('mergeable') || @attrs.fetch('mergeable').nil?
   end
 
   def merged?
