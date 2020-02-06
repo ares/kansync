@@ -31,6 +31,7 @@ whitelist:
   - 100-sync_bz_link_from_redmine
   - 150-set_assignee_according_to_redmine
   - 200-set_column_according_to_redmine
+  - 250-set_column_according_to_tags
   - 400-sync_bz_bugs_to_triage
 
 # you can further limit what tasks will not be executed by blacklist
@@ -71,6 +72,12 @@ configuration:
       # never move task to backlog automatically, once it's already in progress
       Backlog:
         column: ['Work in progress']
+  250-set_column_according_to_tags:
+    map:
+      waiting_on_contributor: 'Work in progress'
+      needs_rebase: 'Work in progress'
+      waiting_on_packaging: 'Blocked'
+      blocked_by_another_pr: 'Blocked'
   400-sync_bz_bugs_to_triage:
     color: 'amber'
     tag: 'Triage'

@@ -1,3 +1,5 @@
 Gemfile.lock
 .idea
 profiles/*.yml
+.ruby-version
+.ruby-gemset
