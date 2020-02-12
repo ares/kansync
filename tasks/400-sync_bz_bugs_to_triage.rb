@@ -34,7 +34,7 @@ default_configuration = {
 
 task_configuration = default_configuration.deep_merge(task_configuration)
 
-existing_triage_tasks = project.current_tasks(filter: "tag:\"#{task_configuration['tag']}\"")
+existing_triage_tasks = project.current_filtered_tasks(filter: "tag:\"#{task_configuration['tag']}\"")
 existing_triage_bzs = existing_triage_tasks.map do |task|
   task.bugzilla_ids
 end.flatten.uniq

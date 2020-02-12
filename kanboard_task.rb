@@ -34,11 +34,11 @@ class KanboardTask < KanboardResource
   end
 
   def redmine_links
-    external_links.select { |link| link.url.include?(REDMINE_URL)}
+    @redmine_links ||= external_links.select { |link| link.url.include?(REDMINE_URL)}
   end
 
   def redmine_issues
-    redmine_links.map do |link|
+    @redmine_issues ||= redmine_links.map do |link|
       RedmineIssue.new(link.url)
     end
   end
@@ -48,7 +48,7 @@ class KanboardTask < KanboardResource
   end
 
   def github_links
-    external_links.select { |link| link.url.include?(GITHUB_URL)}
+    @github_links ||= external_links.select { |link| link.url.include?(GITHUB_URL)}
   end
 
   def bugzilla_links?
@@ -56,7 +56,7 @@ class KanboardTask < KanboardResource
   end
 
   def bugzilla_links
-    external_links.select { |link| link.url.include?(BUGZILLA_URL)}
+    @bugzilla_links ||= external_links.select { |link| link.url.include?(BUGZILLA_URL)}
   end
 
   def bugzilla_ids
@@ -64,7 +64,7 @@ class KanboardTask < KanboardResource
   end
 
   def bugzillas
-    bugzila_links.map { |link| Bugzilla.load(link) }
+    @bugzillas ||= bugzila_links.map { |link| Bugzilla.load(link) }
   end
 
   def sync_bugzilla_links
@@ -98,7 +98,7 @@ class KanboardTask < KanboardResource
   end
 
   def external_links
-    connection.request('getAllExternalTaskLinks', { 'task_id' => @id }).map do |attrs|
+    @external_links ||= connection.request('getAllExternalTaskLinks', { 'task_id' => @id }).map do |attrs|
       KanboardExternalLink.new(attrs)
     end
   end
@@ -128,7 +128,7 @@ class KanboardTask < KanboardResource
   end
 
   def tags
-    connection.request('getTaskTags', [@id]).map(&:last)
+    @tags ||= connection.request('getTaskTags', [@id]).map(&:last)
   end
 
   def set_tags(tags)
@@ -137,6 +137,6 @@ class KanboardTask < KanboardResource
   end
 
   def owner
-    KanboardUser.find_by_id(self.owner_id)
+    @owner ||= KanboardUser.find_by_id(self.owner_id)
   end
 end

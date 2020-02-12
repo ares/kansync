@@ -2,14 +2,18 @@ require 'kanboard_resource'
 
 class KanboardProject < KanboardResource
   def current_swimlane
-    KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[0])
+    @current_swimlane ||= KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[0])
   end
 
   def previous_swimlane
-    KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[2])
+    @previous_swimlane ||= KanboardSwimlane.new(connection.request('getActiveSwimlanes', { 'project_id' => @id})[2])
   end
 
-  def current_tasks(filter: '')
+  def current_tasks
+    @current_tasks ||= search_tasks(%Q(status:open swimlane:"#{current_swimlane.name}"))
+  end
+
+  def current_filtered_tasks(filter: '')
     search_tasks(%Q(status:open swimlane:"#{current_swimlane.name}" #{filter}))
   end
 

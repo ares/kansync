@@ -24,13 +24,15 @@ class TaskRunner
       tasks.sort!
     end
 
+    project = KanboardProject.new('id' => project_id)
     tasks.each do |task|
-      project = KanboardProject.new('id' => project_id)
       task_configuration = profile.task_configuration.fetch(task_name(task), {})
 
       logger.info "Starting task #{task}"
+      start = Time.now
       instance_eval File.read(task), task, 1
-      logger.info "Finished task #{task}\n"
+      finish = Time.now
+      logger.info "Finished task #{task} in #{finish-start} seconds\n"
     end
   end
 
