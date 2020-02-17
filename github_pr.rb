@@ -11,11 +11,21 @@ class GithubPr
       logger.error "Invalid github PR link #{url}, skipping"
       raise "invalid github URL"
     end
-    @url = "/repos/#{owner}/#{repository}/pulls/#{pr_number}"
+    url = "/repos/#{owner}/#{repository}/pulls/#{pr_number}"
+    @attrs, @url = with_redirect_following(url, username, password) do |connection, url|
+      response = connection.get(url)
+      JSON.parse(response.body)
+    end
+  end
+
+  def with_redirect_following(url, username, password)
     connection = Faraday.new(GITHUB_API_FQDN)
     connection.basic_auth(username, password) unless username.empty? && password.empty?
-    response = connection.get(@url)
-    @attrs = JSON.parse(response.body)
+    loop do
+      attrs = yield(connection, url)
+      return attrs, url if attrs['message'] != 'Moved Permanently'
+      url = attrs['url']
+    end
   end
 
   def id
