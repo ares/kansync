@@ -10,23 +10,23 @@ github_password = @profile.github_options['password']
 project.current_tasks.each do |task|
   logger.info "Processing #{task.title}"
 
-  if task.github_links?
-    task.github_links.each do |github_link|
-      begin
-        pr = GithubPr.new(github_link.url, github_username, github_password)
-      rescue
-        logger.error "invalid github URL #{github_link.url}, skipping"
-        next
-      end
+  redmine_links = task.redmine_links
 
-      if (issue = pr.redmine_issue)
-        unless task.redmine_links.map(&:url).include?(issue.url)
-          logger.warn "Adding redmine link #{issue.url}"
-          task.create_redmine_links(issue.url)
-        end
-      else
-        logger.debug "No redmine issue found for #{github_link.url}"
+  task.github_links.each do |github_link|
+    begin
+      pr = GithubPr.new(github_link.url, github_username, github_password)
+    rescue
+      logger.error "invalid github URL #{github_link.url}, skipping"
+      next
+    end
+
+    if (issue = pr.redmine_issue)
+      unless redmine_links.map(&:url).include?(issue.url)
+        logger.warn "Adding redmine link #{issue.url}"
+        task.create_redmine_links(issue.url)
       end
+    else
+      logger.debug "No redmine issue found for #{github_link.url}"
     end
   end
 end

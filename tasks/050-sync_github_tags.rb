@@ -30,32 +30,30 @@ project.current_tasks.each do |task|
 
   pr = nil
   tags = task.github_links.map do |github_link|
-    if task.github_links?
-      begin
-        pr = GithubPr.new(github_link.url, github_username, github_password)
-      rescue
-        logger.error "invalid github URL #{github_link.url}, skipping"
-        next
-      end
-
-      labels = []
-      # closed PRs should be ignored entirely, we return no labels for them
-      unless pr.closed?
-        custom_labels = pr.needs_rebase? ? ['needs_rebase'] : []
-        labels = custom_labels + pr.labels
-      end
-      labels
+    begin
+      pr = GithubPr.new(github_link.url, github_username, github_password)
+    rescue
+      logger.error "invalid github URL #{github_link.url}, skipping"
+      next
     end
+
+    labels = []
+    # closed PRs should be ignored entirely, we return no labels for them
+    unless pr.closed?
+      custom_labels = pr.needs_rebase? ? ['needs_rebase'] : []
+      labels = custom_labels + pr.labels
+    end
+    labels
   end
 
   github_tags = convert_to_kanboard_tags(tags.flatten.compact.uniq, task_configuration['tags_map'])
-  task_tags = task.tags
+  old_tags = task_tags = task.tags
 
   task_tags -= task_configuration['auto_remove_tags'].select { |t| !github_tags.include?(t) && task_tags.include?(t) }
   task_tags += github_tags.select { |t| task_configuration['sync_tags'].include?(t) }
   task_tags.uniq!
 
-  if task.tags.sort != task_tags.sort
+  if old_tags.sort != task_tags.sort
     logger.warn "Changing tags from #{task.tags.inspect} to #{task_tags.inspect}"
     task.set_tags(task_tags)
   end

@@ -4,6 +4,7 @@ class RequestFactory
     @user = connection_options['user']
     @pw = connection_options['pw']
     @counter = 0
+    @logger = Kansync.logger
     @connection = Faraday.new(:url => @url) do |faraday|
       # faraday.response :logger
       faraday.basic_auth(@user, @pw)
@@ -20,13 +21,14 @@ class RequestFactory
         'method' => method,
     }
     body.merge!('params' => params) unless params.nil?
-
+# start = Time.now
+# @logger.debug "starting request #{method} with params #{body}"
     response = @connection.post do |req|
       req.url '/jsonrpc.php'
       req.headers['Content-Type'] = 'application/json'
       req.body = body.to_json
     end
-
+# @logger.debug "request #{method} finished in #{Time.now-start}"
     parsed_body = JSON.parse(response.body)
     if parsed_body['result']
       return parsed_body['result']
