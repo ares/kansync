@@ -57,14 +57,19 @@ module Kansync
     @kanboard_connection = RequestFactory.new(connection_options)
   end
 
-  def self.prepare_bz_connection(connection_options)
-    Bugzilla.set_options(connection_options)
+  def self.prepare_bz_connection(profile)
+    Bugzilla.set_options(profile.bugzilla_options, profile.bugzilla_config)
+  end
+
+  def self.prepare_jira_connection(profile)
+    Jira.set_config(profile.jira_config)
   end
 
   def self.setup(profile)
     prepare_logger(profile.logger_level)
     prepare_kanboard_connection(profile.kanboard_options)
-    prepare_bz_connection(profile.bugzilla_options)
+    prepare_bz_connection(profile)
+    prepare_jira_connection(profile)
   end
 end
 
@@ -108,5 +113,3 @@ end
 # TODO need a separate script to help with new iteration setup
 # TODO scripts may need custom configuration per profile, e.g. email mapping
 # TODO README with links to APIs, docker image, sql converting trick
-
-
