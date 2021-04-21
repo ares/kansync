@@ -8,6 +8,8 @@ require 'logger'
 require 'active_support/core_ext/hash/conversions.rb'
 require 'active_support/core_ext/numeric/time.rb'
 require 'pry'
+require 'pry-byebug'
+require 'pry-stack_explorer'
 require 'optparse'
 require 'clamp'
 
@@ -30,6 +32,7 @@ require 'kanboard_mapper'
 
 require 'redmine_issue'
 require 'bugzilla'
+require 'jira'
 require 'github_pr'
 
 require 'profile'
@@ -107,9 +110,35 @@ Clamp do
       puts "Kanboard task #{task.id} created"
     end
   end
+
+  subcommand 'foreman_rh_cloud', 'Commands specific to foreman_rh_cloud plugin process' do
+    profile_options
+
+    subcommand 'link_jira_to_bz', 'Link a BZ issue to an existing Jira issue' do
+      option ['-j', '--jira-id'], 'JIRA_ID', 'Jira id', required: true
+      option ['-b', '--bz-id'], 'BZ_ID', 'Bugzilla id', required: true
+
+      def execute
+        require_relative 'subcommands/link_jira_to_bz'
+        LinkJiraToBz.new(profile: profile_object, jira_id: jira_id, bz_id: bz_id).run
+      end
+    end
+
+    subcommand 'fix_bz', 'Mark a BZ as fixed' do
+      option ['-b', '--bz-id'], 'BZ_ID', 'Bugzilla id', required: true
+      option ['-v', '--version'], 'VERSION', 'Fixed in plugin version', required: true
+
+      def execute
+        require_relative 'subcommands/fix_bz'
+        FixBz.new(profile: profile_object, bz_id: bz_id, fixed_in: version).run
+      end
+    end
+  end
 end
 
 # TODO need a separate script to create cards
 # TODO need a separate script to help with new iteration setup
 # TODO scripts may need custom configuration per profile, e.g. email mapping
 # TODO README with links to APIs, docker image, sql converting trick
+
+#09-7487410

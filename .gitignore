@@ -3,3 +3,6 @@ Gemfile.lock
 profiles/*.yml
 .ruby-version
 .ruby-gemset
+.bundle
+vendor
+.devcontainer
