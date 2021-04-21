@@ -1,3 +1,6 @@
+require 'rest-client'
+require 'jsonrpc-client'
+
 class Bugzilla
   def initialize(attrs)
     @attrs = attrs
@@ -87,7 +90,7 @@ class Bugzilla
     bz_api['bug']["#{id}"].put(all_fields)
   end
 
-  def bugzilla_url(bz_id)
+  def self.bugzilla_url(bz_id)
     "#{config.url}/show_bug.cgi?id=#{bz_id}"
   end
 
