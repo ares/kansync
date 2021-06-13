@@ -133,6 +133,16 @@ Clamp do
         FixBz.new(profile: profile_object, bz_id: bz_id, fixed_in: version).run
       end
     end
+
+    subcommand 'bz_to_jira', 'Clone BZ issue to Jira' do
+      option ['-b', '--bz-id'], 'BZ_ID', 'Bugzilla id', required: true
+      option ['-t', '--title'], 'TITLE', 'Override title text', required: false
+
+      def execute
+        require_relative 'subcommands/clone_bz_to_jira'
+        CloneBzToJira.new(profile: profile_object, bz_id: bz_id, project: 'TFMRHCLOUD').run(summary: title)
+      end
+    end
   end
 end
 
@@ -140,5 +150,3 @@ end
 # TODO need a separate script to help with new iteration setup
 # TODO scripts may need custom configuration per profile, e.g. email mapping
 # TODO README with links to APIs, docker image, sql converting trick
-
-#09-7487410

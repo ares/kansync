@@ -29,6 +29,23 @@ class Jira
     )
   end
 
+  def self.create_issue(summary:, project:, fields: {})
+    options = fields.merge(
+      'summary' => summary,
+      'project' => {
+        'key' => project
+      },
+      'issuetype' => {
+        'id' => '3',
+      }
+    )
+
+    issue = api.Issue.build
+    issue.save(fields: options)
+    issue.fetch
+    issue
+  end
+
   def self.active_sprints
     api.Agile.get_sprints(config.board, state: 'active')
   end
@@ -46,6 +63,7 @@ class Jira
       site: config.site,
       context_path: '',
       auth_type: :basic,
+      ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE,
     })
   end
 
