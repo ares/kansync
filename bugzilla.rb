@@ -45,8 +45,8 @@ class Bugzilla
   end
 
   def self.bz_query(filters = {})
-    filters = filters.merge('api_key' => config.api_key) if config.api_key
-    conn = Faraday.new(:url => config.url) do |faraday|
+    headers = { 'Authorization' => "Bearer #{config.api_key}"} if config.api_key
+    conn = Faraday.new(url: config.url, headers: headers) do |faraday|
       faraday.request :url_encoded
       faraday.response :logger
       faraday.adapter Faraday.default_adapter
